@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Issue {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
