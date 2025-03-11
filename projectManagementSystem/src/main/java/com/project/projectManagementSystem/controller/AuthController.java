@@ -2,49 +2,50 @@ package com.project.projectManagementSystem.controller;
 
 import com.project.projectManagementSystem.config.JwtProvider;
 import com.project.projectManagementSystem.domain.dto.UserDto;
+import com.project.projectManagementSystem.domain.request.LoginRequest;
 import com.project.projectManagementSystem.domain.response.AuthResponse;
 import com.project.projectManagementSystem.service.AuthService;
-import com.project.projectManagementSystem.service.CustomUserDetailsImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping("/auth")
+@Slf4j
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
-    private final CustomUserDetailsImpl customUserDetails;
-
-    @Autowired
-    public AuthController(AuthService authService, CustomUserDetailsImpl customUserDetails) {
-        this.authService = authService;
-        this.customUserDetails = customUserDetails;
-    }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> createUserHandler(@RequestBody UserDto userDto) throws Exception {
-        System.out.println("Received signup request: " + userDto);
-
-        UserDto savedUser = authService.signup(userDto);
-        System.out.println("User saved: " + savedUser);
-
+    public ResponseEntity<AuthResponse> createUserHandler(@RequestBody UserDto userDto) {
+        authService.signup(userDto);
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
         String jwt = JwtProvider.generateToken(authentication);
 
-        AuthResponse response = new AuthResponse();
-        response.setMessage("Signup successful");
-        response.setJwt(jwt);
-
-        return new ResponseEntity<>(response, HttpStatus.CREATED); // Return the AuthResponse
+        return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse("Signup successful", jwt));
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> loginHandler(@RequestBody LoginRequest loginRequest) {
+        log.info("Login attempt with email: {}", loginRequest.getEmail());
+
+        try {
+            Authentication authentication = authService.authenticate(loginRequest.getEmail(), loginRequest.getPassword());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = JwtProvider.generateToken(authentication);
+
+            return ResponseEntity.ok(new AuthResponse("Login successful", jwt));
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse("Invalid username or password", null));
+        }
+    }
+
 }

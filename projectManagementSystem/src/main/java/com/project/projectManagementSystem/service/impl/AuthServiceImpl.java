@@ -5,47 +5,48 @@ import com.project.projectManagementSystem.domain.entity.User;
 import com.project.projectManagementSystem.mapper.UserMapper;
 import com.project.projectManagementSystem.repository.UserRepository;
 import com.project.projectManagementSystem.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.project.projectManagementSystem.service.CustomUserDetailsImpl;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
-
-    @Autowired
-    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.userMapper = userMapper;
-    }
+    private final CustomUserDetailsImpl customUserDetails;
 
     @Override
     public UserDto signup(UserDto userDto) {
-        System.out.println("Input UserDto: " + userDto);
+        log.info("Signing up user with email: {}", userDto.getEmail());
 
-        // Check if email exists
-        if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
+        userRepository.findByEmail(userDto.getEmail()).ifPresent(user -> {
             throw new IllegalArgumentException("Email already exists with another account");
+        });
+
+        User userEntity = userMapper.toEntity(userDto);
+        userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
+
+        User savedUser = userRepository.save(userEntity);
+        return userMapper.toDto(savedUser);
+    }
+
+    @Override
+    public Authentication authenticate(String email, String password) {
+        UserDetails userDetails = customUserDetails.loadUserByUsername(email);
+        if (userDetails == null || !passwordEncoder.matches(password, userDetails.getPassword())) {
+            throw new BadCredentialsException("Invalid email or password");
         }
 
-        // Convert DTO to entity using mapper
-        User userEntity = userMapper.toEntity(userDto);
-        System.out.println("After mapping to entity: " + userEntity);
-
-        // Encode password
-        userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        System.out.println("After password encoding: " + userEntity);
-
-        // Save user and return the DTO
-        User savedUser = userRepository.save(userEntity);
-        System.out.println("After saving: " + savedUser);
-
-        UserDto resultDto = userMapper.toDto(savedUser);
-        System.out.println("Result DTO: " + resultDto);
-        return resultDto;
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 }
