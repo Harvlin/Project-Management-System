@@ -1,7 +1,7 @@
 package com.project.projectManagementSystem.config;
 
 public class JwtConstant {
-    public static final String JWT_SECRET = "secret";
+    public static final String JWT_SECRET = "your_very_secure_secret_key_which_is_long_enough";
     public static final String JWT_HEADER = "Authorization";
     public static final String JWT_ISSUER = "issuer";
     public static final String JWT_AUDIENCE = "audience";
