@@ -26,5 +26,6 @@ public class User {
     @JsonIgnore
     @OneToMany(mappedBy = "assignee", cascade = CascadeType.ALL)
     private List<Issue> assignedIssue = new ArrayList<>();
+
     private int projectSize;
 }
