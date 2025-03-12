@@ -1,4 +1,4 @@
-package com.project.projectManagementSystem.service;
+package com.project.projectManagementSystem.service.impl;
 
 import com.project.projectManagementSystem.domain.entity.User;
 import com.project.projectManagementSystem.repository.UserRepository;

@@ -5,7 +5,6 @@ import com.project.projectManagementSystem.domain.entity.Project;
 import com.project.projectManagementSystem.domain.entity.User;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ProjectService {
     Project createProject(Project project, User user) throws Exception;

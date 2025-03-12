@@ -5,7 +5,6 @@ import com.project.projectManagementSystem.domain.entity.User;
 import com.project.projectManagementSystem.mapper.UserMapper;
 import com.project.projectManagementSystem.repository.UserRepository;
 import com.project.projectManagementSystem.service.AuthService;
-import com.project.projectManagementSystem.service.CustomUserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
