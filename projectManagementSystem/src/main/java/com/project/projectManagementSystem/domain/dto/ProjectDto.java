@@ -21,5 +21,4 @@ public class ProjectDto {
     private UserDto owner;
     private List<IssueDto> issueDtos = new ArrayList<>();
     private Chat chat;
-    private List<IssueDto> issues = new ArrayList<>();
 }

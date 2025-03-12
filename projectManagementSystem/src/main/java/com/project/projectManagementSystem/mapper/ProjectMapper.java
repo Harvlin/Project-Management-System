@@ -1,5 +1,6 @@
 package com.project.projectManagementSystem.mapper;
 
+import com.project.projectManagementSystem.domain.dto.ProjectDto;
 import com.project.projectManagementSystem.domain.entity.Project;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
