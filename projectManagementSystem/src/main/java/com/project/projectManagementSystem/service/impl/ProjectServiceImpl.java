@@ -21,13 +21,11 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserService userService;
-    private final ChatService chatService;
 
     @Autowired
-    public ProjectServiceImpl(ProjectRepository projectRepository, UserService userService, ChatService chatService) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, UserService userService) {
         this.projectRepository = projectRepository;
         this.userService = userService;
-        this.chatService = chatService;
     }
 
     @Override
