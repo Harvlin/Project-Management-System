@@ -16,6 +16,8 @@ public class Comments {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    private String content;
+
     private LocalDateTime createdDateTime;
 
     @ManyToOne

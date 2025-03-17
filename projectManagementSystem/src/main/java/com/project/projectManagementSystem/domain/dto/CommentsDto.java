@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Data
 public class CommentsDto {
     private Long id;
+    private String content;
     private LocalDateTime createdDateTime;
     private UserDto userDto;
     private IssueDto issueDto;
