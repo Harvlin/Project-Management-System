@@ -25,7 +25,8 @@ public class IssueServiceImpl implements IssueService {
 
     @Override
     public Issue getIssueById(Long id) {
-        return issueRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        return issueRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Issue not found with id " + id));
     }
 
     @Override
@@ -34,17 +35,17 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    public Issue createIssue(Issue issue, Long userId) throws Exception {
+    public Issue createIssue(Issue issue, Long userId) {
         return issueRepository.save(issue);
     }
 
     @Override
-    public void deleteIssue(Long issueId, Long userId) throws Exception {
+    public void deleteIssue(Long issueId, Long userId) {
         issueRepository.deleteById(issueId);
     }
 
     @Override
-    public Issue addUserToIssue(Long issueId, Long userId) throws Exception {
+    public Issue addUserToIssue(Long issueId, Long userId) throws Exception{
         User user = userService.findUserById(userId);
         Issue issue = getIssueById(issueId);
         issue.setAssignee(user);
@@ -52,7 +53,7 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    public Issue updateStatus(Long issueId, String status) throws Exception {
+    public Issue updateStatus(Long issueId, String status) {
         Issue issue = getIssueById(issueId);
         issue.setStatus(status);
         return issueRepository.save(issue);

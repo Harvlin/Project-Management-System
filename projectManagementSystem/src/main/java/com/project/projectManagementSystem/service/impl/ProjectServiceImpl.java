@@ -50,11 +50,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project getProjectById(Long id) {
-        return projectRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Project not found"));
+        return projectRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
     }
 
     @Override
-    public void deleteProject(Long projectId, Long userId) throws Exception {
+    public void deleteProject(Long projectId, Long userId) {
         if (projectRepository.existsById(projectId)) {
             projectRepository.deleteById(projectId);
         } else {
@@ -74,7 +75,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void addUserToProject(Long projectId, Long userId) throws Exception {
+    public void addUserToProject(Long projectId, Long userId) {
         Project project = getProjectById(projectId);
         User user = userService.findUserById(userId);
         if (!project.getTeam().contains(user)) {
@@ -85,7 +86,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void removeUserFromProject(Long projectId, Long userId) throws Exception {
+    public void removeUserFromProject(Long projectId, Long userId) {
         Project project = getProjectById(projectId);
         User user = userService.findUserById(userId);
         if (!project.getTeam().contains(user)) {
@@ -96,13 +97,13 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Chat getChatByProjectId(Long projectId) throws Exception {
+    public Chat getChatByProjectId(Long projectId) {
         Project project = getProjectById(projectId);
         return project.getChat();
     }
 
     @Override
-    public List<Project> searchProject(String keyword, User user) throws Exception {
+    public List<Project> searchProject(String keyword, User user) {
         return projectRepository.findByNameContainingAndTeamContains(keyword, user);
     }
 }

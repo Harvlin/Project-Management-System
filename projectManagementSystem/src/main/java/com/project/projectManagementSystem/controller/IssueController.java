@@ -4,17 +4,14 @@ import com.project.projectManagementSystem.domain.dto.IssueDto;
 import com.project.projectManagementSystem.domain.entity.Issue;
 import com.project.projectManagementSystem.domain.entity.User;
 import com.project.projectManagementSystem.domain.request.IssueRequest;
-import com.project.projectManagementSystem.domain.response.AuthResponse;
 import com.project.projectManagementSystem.mapper.IssueMapper;
 import com.project.projectManagementSystem.service.IssueService;
 import com.project.projectManagementSystem.service.UserService;
-import jakarta.servlet.ServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/issues")
@@ -31,20 +28,20 @@ public class IssueController {
     }
 
     @GetMapping("/{issueId}")
-    public ResponseEntity<IssueDto> getIssueById(@PathVariable("issueId") Long issueId) throws Exception {
+    public ResponseEntity<IssueDto> getIssueById(@PathVariable("issueId") Long issueId)  {
         Issue issue = issueService.getIssueById(issueId);
         return ResponseEntity.ok(issueMapper.toDto(issue));
     }
 
     @GetMapping("/project/{projectId}")
-    public ResponseEntity<List<IssueDto>> getIssuesByProjectId(@PathVariable("projectId") Long projectId) throws Exception {
+    public ResponseEntity<List<IssueDto>> getIssuesByProjectId(@PathVariable("projectId") Long projectId){
         List<Issue> issues = issueService.getIssuesByProjectId(projectId);
         List<IssueDto> issueDtos = issues.stream().map(issueMapper::toDto).toList();
         return ResponseEntity.ok(issueDtos);
     }
 
     @PostMapping
-    public ResponseEntity<IssueDto> createIssue(@RequestBody IssueRequest issueRequest, @RequestHeader("Authorization") String token) throws Exception {
+    public ResponseEntity<IssueDto> createIssue(@RequestBody IssueRequest issueRequest, @RequestHeader("Authorization") String token) {
         System.out.println("issue -> " + issueRequest);
         User userToken = userService.findUserProfileByJwt(token);
         Issue issue = issueService.createIssue(issueMapper.fromRequest(issueRequest), userToken.getId());
@@ -52,7 +49,7 @@ public class IssueController {
     }
 
     @DeleteMapping("/{issueId")
-    public ResponseEntity deleteIssue(@PathVariable("issueId") Long issueId, @RequestHeader("Authorization") String token) throws Exception {
+    public ResponseEntity deleteIssue(@PathVariable("issueId") Long issueId, @RequestHeader("Authorization") String token)  {
         User user = userService.findUserProfileByJwt(token);
         issueService.deleteIssue(issueId, user.getId());
         return ResponseEntity.noContent().build();
@@ -65,7 +62,7 @@ public class IssueController {
     }
 
     @PutMapping("/{issueId}/status/{status}")
-    public ResponseEntity<IssueDto> updateIssueStatus(@PathVariable Long issueId, @PathVariable("status") String status) throws Exception {
+    public ResponseEntity<IssueDto> updateIssueStatus(@PathVariable Long issueId, @PathVariable("status") String status) {
         Issue issue = issueService.updateStatus(issueId, status);
         return ResponseEntity.ok(issueMapper.toDto(issue));
     }

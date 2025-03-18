@@ -7,6 +7,7 @@ import com.project.projectManagementSystem.repository.CommentRepository;
 import com.project.projectManagementSystem.repository.IssueRepository;
 import com.project.projectManagementSystem.repository.UserRepository;
 import com.project.projectManagementSystem.service.CommentService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,27 +29,37 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comments crateComment(Long issueId, Long userId, String content) {
-        Optional<Issue> issue = issueRepository.findById(issueId);
-        Optional<User> user = userRepository.findById(userId);
+    public Comments createComment(Long issueId, Long userId, String content) {
+        Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new EntityNotFoundException("Issue not found with id " + issueId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id " + userId));
 
-        Comments comments = new Comments();
-        comments.setIssue(issue.get());
-        comments.setUser(user.get());
-        comments.setCreatedDateTime(LocalDateTime.now());
-        comments.setContent(content);
+        Comments comment = Comments.builder()
+                .issue(issue)
+                .user(user)
+                .content(content)
+                .createdDateTime(LocalDateTime.now())
+                .build();
 
-        issue.get().getComments().add(comments);
-        return commentRepository.save(comments);
+        issue.getComments().add(comment);
+        return commentRepository.save(comment);
     }
 
     @Override
-    public void deleteComment(Long commentId, Long userId) {
+    public void deleteComment(Long commentId, Long userId) throws Exception {
+        Comments comments = commentRepository.findById(commentId)
+                .orElseThrow(() -> new EntityNotFoundException("Comment not found with id " + commentId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id " + userId));
 
+        if (comments.getUser().equals(user)) {
+            commentRepository.delete(comments);
+        }
     }
 
     @Override
     public List<Comments> findCommentsByIssueId(Long issueId) {
-        return List.of();
+        return commentRepository.findCommentsByIssueId(issueId);
     }
 }

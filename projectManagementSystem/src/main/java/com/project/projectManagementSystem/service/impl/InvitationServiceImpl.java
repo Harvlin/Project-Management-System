@@ -26,13 +26,13 @@ public class InvitationServiceImpl implements InvitationService {
     @Override
     public void sendInvitation(String email, Long projectId) throws MessagingException {
         String invitationToken = UUID.randomUUID().toString();
-        Invitation invitation = new Invitation();
 
-        invitation.setEmail(email);
-        invitation.setProjectId(projectId);
-        invitation.setToken(invitationToken);
-
-        invitationRepository.save(invitation);
+        Invitation invite = Invitation.builder()
+                .email(email)
+                .projectId(projectId)
+                .token(invitationToken)
+                .build();
+        invitationRepository.save(invite);
 
         String invitationLink = "http://localhost:5173/accept_invitation?token=" + invitationToken;
         emailService.sendEmailWithToken(email, invitationLink);
